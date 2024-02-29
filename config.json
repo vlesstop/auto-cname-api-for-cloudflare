@@ -1,0 +1,8 @@
+{
+    "cname1": "xx1.com",
+    "cname2": "xx2.com",
+    "api_call": "aaa.aaa.com",
+    "cloudflare_email": "your_email@example.com",
+    "cloudflare_api_key": "your_api_key",
+    "cloudflare_zone_id": "your_zone_id"
+  }
