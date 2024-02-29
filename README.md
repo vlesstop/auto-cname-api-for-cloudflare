@@ -17,7 +17,7 @@
 
 
 安装pip
-对于Python 3
+对于Python 3.6
 大多数现代Linux发行版和macOS系统已经预安装了Python 3和pip。如果你的系统中没有pip3，你可能需要手动安装它。
 
 在Linux上：
@@ -33,6 +33,8 @@ sudo apt install python3-pip
 bash
 Copy code
 sudo dnf install python3-pip
+sudo yum install rh-python36
+
 对于CentOS/RHEL，CentOS 7及以下版本可能需要先启用EPEL仓库：
 
 bash
