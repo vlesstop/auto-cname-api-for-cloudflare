@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import subprocess
 import requests
@@ -16,7 +18,7 @@ zone_id = config['cloudflare_zone_id']
 
 def ping(domain):
     try:
-        output = subprocess.check_output(['ping', '-c', '1', domain], stderr=subprocess.STDOUT, universal_newlines=True)
+        subprocess.check_output(['ping', '-c', '1', '-W', '5', domain], stderr=subprocess.STDOUT, universal_newlines=True)
         return True
     except subprocess.CalledProcessError:
         return False
@@ -46,20 +48,32 @@ def update_dns_record(zone_id, name, content):
         print(f"未找到DNS记录: {name}")
 
 def check_and_update(domain, cname):
-    for _ in range(3):
-        if ping(domain):
-            return True
-        time.sleep(5)
-    update_dns_record(zone_id, api_call_domain, cname)
-    return False
-
-while True:
-    if not ping(api_call_domain):
-        print(f"{api_call_domain}不通，开始检测cname1...")
-        if not check_and_update(cname1, cname1):
-            print(f"cname1不通，开始检测cname2...")
-            if not check_and_update(cname2, cname2):
-                print("cname1和cname2都不通，等待下一轮检测...")
+    if ping(domain):
+        print(f"{domain} ping通了，无需更改DNS记录。")
+        return True
     else:
-        print(f"{api_call_domain}通畅")
-    time.sleep(10)
+        print(f"{domain} ping不通，正在更新DNS记录为：{cname}")
+        update_dns_record(zone_id, api_call_domain, cname)
+        return False
+
+def main_loop():
+    while True:
+        success = False
+        for attempt in range(3):
+            if ping(api_call_domain):
+                print(f"{api_call_domain}通畅")
+                success = True
+                break
+            else:
+                print(f"{api_call_domain} ping不通，尝试次数：{attempt + 1}/3")
+                time.sleep(5)
+        
+        if not success:
+            print(f"{api_call_domain}连续3次ping不通，开始检测cname1...")
+            if not check_and_update(cname1, cname1):
+                print(f"cname1 ({cname1}) 也不通，开始检测cname2...")
+                check_and_update(cname2, cname2)
+        time.sleep(10)
+
+if __name__ == "__main__":
+    main_loop()
