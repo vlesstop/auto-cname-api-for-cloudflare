@@ -23,6 +23,14 @@ def ping(domain):
     except subprocess.CalledProcessError:
         return False
 
+def perform_ping_checks(domain):
+    """Perform 3 ping checks for a given domain."""
+    for _ in range(3):
+        if ping(domain):
+            return True
+        time.sleep(5)
+    return False
+
 def get_current_cname(zone_id, name):
     url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records?type=CNAME&name={name}"
     headers = {
@@ -32,8 +40,7 @@ def get_current_cname(zone_id, name):
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200 and response.json()['result']:
-        current_cname = response.json()['result'][0]['content']
-        return current_cname
+        return response.json()['result'][0]['content']
     else:
         print(f"获取当前CNAME记录失败: {response.text}")
         return None
@@ -64,31 +71,21 @@ def update_dns_record(zone_id, name, content):
 
 def main_loop():
     while True:
-        for attempt in range(3):
-            if ping(api_call_domain):
-                print(f"{api_call_domain}通畅")
-                break
-            else:
-                print(f"{api_call_domain} ping不通，尝试次数：{attempt + 1}/3")
-                time.sleep(5)
-        else:  # 如果api_call_domain连续3次ping不通
+        # Check api_call_domain with 3 attempts
+        if not perform_ping_checks(api_call_domain):
             current_cname = get_current_cname(zone_id, api_call_domain)
-            if current_cname == cname1:
-                if ping(cname1):
-                    print(f"{cname1} ping通了，无需更改DNS记录。")
-                else:
-                    print(f"{cname1} ping不通，开始检测cname2...")
-                    if ping(cname2):
-                        update_dns_record(zone_id, api_call_domain, cname2)
-            elif current_cname == cname2:
-                if not ping(cname2):
-                    print(f"{cname2} ping不通，无需进一步操作。")
-            else:
-                if ping(cname1):
+            # Check cname1 with 3 attempts
+            if perform_ping_checks(cname1):
+                if current_cname != cname1:
                     update_dns_record(zone_id, api_call_domain, cname1)
-                elif ping(cname2):
-                    update_dns_record(zone_id, api_call_domain, cname2)
-        time.sleep(10)  # 检查周期间隔
+            else:
+                # Check cname2 with 3 attempts if cname1 fails
+                if perform_ping_checks(cname2):
+                    if current_cname != cname2:
+                        update_dns_record(zone_id, api_call_domain, cname2)
+        else:
+            print(f"{api_call_domain} is accessible.")
+        time.sleep(10)
 
 if __name__ == "__main__":
     main_loop()
