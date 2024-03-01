@@ -24,11 +24,15 @@ def ping(domain):
         return False
 
 def perform_ping_checks(domain):
-    """Perform 3 ping checks for a given domain."""
-    for _ in range(3):
+    """Perform 3 ping checks for a given domain and return True if any succeed."""
+    for attempt in range(3):
         if ping(domain):
+            print(f"{domain} 通畅，可以访问.")
             return True
-        time.sleep(5)
+        else:
+            print(f"{domain} ping不通，尝试次数：{attempt + 1}/3")
+            time.sleep(5)
+    print(f"{domain} 连续3次ping不通。")
     return False
 
 def get_current_cname(zone_id, name):
@@ -71,21 +75,15 @@ def update_dns_record(zone_id, name, content):
 
 def main_loop():
     while True:
-        # Check api_call_domain with 3 attempts
         if not perform_ping_checks(api_call_domain):
             current_cname = get_current_cname(zone_id, api_call_domain)
-            # Check cname1 with 3 attempts
-            if perform_ping_checks(cname1):
-                if current_cname != cname1:
-                    update_dns_record(zone_id, api_call_domain, cname1)
+            if current_cname != cname1 and perform_ping_checks(cname1):
+                update_dns_record(zone_id, api_call_domain, cname1)
+            elif current_cname != cname2 and perform_ping_checks(cname2):
+                update_dns_record(zone_id, api_call_domain, cname2)
             else:
-                # Check cname2 with 3 attempts if cname1 fails
-                if perform_ping_checks(cname2):
-                    if current_cname != cname2:
-                        update_dns_record(zone_id, api_call_domain, cname2)
-        else:
-            print(f"{api_call_domain} 通畅，可以访问.")
-        time.sleep(10)
+                print("所有备选域名检测均不通畅，无法更新DNS记录。")
+        time.sleep(10)  # 检查周期间隔
 
 if __name__ == "__main__":
     main_loop()
