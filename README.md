@@ -14,14 +14,13 @@
 这个脚本实现了一个基本的循环逻辑，定期检查API调用域名的连通性，并根据配置的备选CNAME记录更新DNS设置。
 
 
-
-
 安装pip
 对于Python 3.6
 大多数现代Linux发行版和macOS系统已经预安装了Python 3和pip。如果你的系统中没有pip3，你可能需要手动安装它。
 
-在Linux上：
 
+
+在Linux上：
 如果你使用的是Debian/Ubuntu及其衍生版，可以使用以下命令安装：
 
 bash
