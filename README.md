@@ -1,8 +1,16 @@
 # auto-cname-api-for-cloudflare
 cname1 为 备用cname 记录
+
+
 cname2 为 备用cname 记录
+
+
 api_call为要修改的域名记录
+
+
 cloudflare_zone_id 为：区域 ID
+
+
 区域ID 查找方法：打开域名， 点击概述， 拉到最下方，在右侧  英文为：zone_id 
 
 利用cloudflare自动切换cname 记录
