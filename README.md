@@ -1,5 +1,9 @@
 # auto-cname-api-for-cloudflare
-
+cname1 为 备用cname 记录
+cname2 为 备用cname 记录
+api_call为要修改的域名记录
+cloudflare_zone_id 为：区域 ID
+区域ID 查找方法：打开域名， 点击概述， 拉到最下方，在右侧  英文为：zone_id 
 
 利用cloudflare自动切换cname 记录
 "cloudflare_email": 你的Cloudflare账户邮箱。
@@ -10,16 +14,12 @@
 确保替换config.json中的配置信息为你自己的实际信息。
 脚本使用requests库来调用Cloudflare API，因此请确保已安装该库（使用命令pip install requests安装）。
 本脚本使用了ping命令进行连通性检测，这在某些环境中可能需要适当的权限。
-脚本中的time.sleep(10)用于在每次检测周期后等待10秒，你可以根据需要调整这个时间间隔。
 这个脚本实现了一个基本的循环逻辑，定期检查API调用域名的连通性，并根据配置的备选CNAME记录更新DNS设置。
 
-
+## 关于必须安装的依赖
 安装pip
-对于Python 3.6
+# Python 3.6建议使用， 不推荐使用Python 3.6以下版本
 大多数现代Linux发行版和macOS系统已经预安装了Python 3和pip。如果你的系统中没有pip3，你可能需要手动安装它。
-
-
-
 在Linux上：
 如果你使用的是Debian/Ubuntu及其衍生版，可以使用以下命令安装：
 
