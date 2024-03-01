@@ -84,7 +84,7 @@ def main_loop():
                     if current_cname != cname2:
                         update_dns_record(zone_id, api_call_domain, cname2)
         else:
-            print(f"{api_call_domain} is accessible.")
+            print(f"{api_call_domain} 通畅，可以访问.")
         time.sleep(10)
 
 if __name__ == "__main__":
