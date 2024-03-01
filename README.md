@@ -9,7 +9,11 @@ cloudflare_zone_id 为：区域 ID
 "cloudflare_email": 你的Cloudflare账户邮箱。
 "cloudflare_api_key": 你的Cloudflare API密钥。
 "cloudflare_zone_id": 你想要修改DNS记录的域名所在的Zone ID。
-
+# 使用方法
+建议放到root目录下，新建文件夹 autocname
+cd /root/autocname 
+python3 auto.py   //前台运行
+nohup python3 auto.py &
 
 确保替换config.json中的配置信息为你自己的实际信息。
 脚本使用requests库来调用Cloudflare API，因此请确保已安装该库（使用命令pip install requests安装）。
