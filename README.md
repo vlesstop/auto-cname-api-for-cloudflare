@@ -17,7 +17,7 @@ cd /root/autocname
 
 python3 auto.py   //前台运行
 
-nohup python3 auto.py &
+nohup python3 auto.py &      //后台运行  
 
 确保替换config.json中的配置信息为你自己的实际信息。
 脚本使用requests库来调用Cloudflare API，因此请确保已安装该库（使用命令pip install requests安装）。
