@@ -62,20 +62,6 @@ def update_dns_record(zone_id, name, content):
     else:
         print(f"未找到DNS记录: {name}")
 
-def check_and_update(domain, cname):
-    current_cname = get_current_cname(zone_id, api_call_domain)
-    if current_cname and current_cname == cname:
-        print(f"{api_call_domain} 的CNAME记录已是 {cname}，无需更改。")
-        return True
-    if ping(domain):
-        print(f"{domain} ping通了。")
-        if current_cname != cname:
-            print(f"当前CNAME记录为 {current_cname}，与目标 {cname} 不匹配，正在更新...")
-            update_dns_record(zone_id, api_call_domain, cname)
-        return True
-    print(f"{domain} ping不通。")
-    return False
-
 def main_loop():
     while True:
         for attempt in range(3):
@@ -86,10 +72,22 @@ def main_loop():
                 print(f"{api_call_domain} ping不通，尝试次数：{attempt + 1}/3")
                 time.sleep(5)
         else:  # 如果api_call_domain连续3次ping不通
-            print(f"{api_call_domain}连续3次ping不通，开始检测cname1...")
-            if not check_and_update(cname1, cname1):
-                print(f"cname1 ({cname1}) 也不通，开始检测cname2...")
-                check_and_update(cname2, cname2)
+            current_cname = get_current_cname(zone_id, api_call_domain)
+            if current_cname == cname1:
+                if ping(cname1):
+                    print(f"{cname1} ping通了，无需更改DNS记录。")
+                else:
+                    print(f"{cname1} ping不通，开始检测cname2...")
+                    if ping(cname2):
+                        update_dns_record(zone_id, api_call_domain, cname2)
+            elif current_cname == cname2:
+                if not ping(cname2):
+                    print(f"{cname2} ping不通，无需进一步操作。")
+            else:
+                if ping(cname1):
+                    update_dns_record(zone_id, api_call_domain, cname1)
+                elif ping(cname2):
+                    update_dns_record(zone_id, api_call_domain, cname2)
         time.sleep(10)  # 检查周期间隔
 
 if __name__ == "__main__":
